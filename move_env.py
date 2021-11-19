@@ -1,26 +1,34 @@
-import os 
-import re
-import argparse
+import os
+def change_name(filenamestr):
+    filename = filenamestr.replace('"', "")
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--name", "-n", type=str, dest="name", required=True )
-args = parser.parse_args()
-filename = args.name
+    id = os.environ.get('id')
+    version = os.environ.get('version')
+    title = os.environ.get('title')
+    authors = os.environ.get('authors')
+    owners = os.environ.get('owners')
+    description = os.environ.get('description')
 
-nuspec_raw= os.popen("cat " + filename).read()
+    fin = open(filename, "rt")
+    #read file contents to string
+    data = fin.read()
 
-id_var = os.environ.get('id')
-version = os.environ.get('version')
-title = os.environ.get('title')
-authors = os.environ.get('authors')
-owners = os.environ.get('owners')
-description = os.environ.get('description')
+    #replace all occurrences of the required string
+    data = data.replace('$id$', id)
+    data = data.replace('$version$', version)
+    data = data.replace('$title$', title)
+    data = data.replace('$author$', authors )
+    data = data.replace('$owner$', owners)
+    data = data.replace('$description$', description)
 
-remove_id = re.sub('\$id\$', id_var, nuspec_raw)
-remove_version = re.sub('\$version\$', version, remove_id)
-remove_title = re.sub('\$title\$', title, remove_version)
-remove_author = re.sub('\$author\$', authors, remove_title)
-remove_owners = re.sub('\$owners\$', owners, remove_author)
-remove_description = re.sub('\$description\$', description, remove_owners)
+    #close the input file
+    fin.close()
 
-print(remove_description)
+    #open the input file in write mode
+    fin = open(filename, "wt")
+    #overrite the input file with the resulting data
+    fin.write(data)
+    #close the file
+    fin.close()
+    
+    return print(os.popen("cat " + filename).read())
